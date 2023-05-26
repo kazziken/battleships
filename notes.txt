@@ -9,5 +9,19 @@
 [X] Render a board with shots
 
 #Pull 3
-[] Decide how to represent Battleships in code
-[] Render a board with Battleshipss
+[X] Decide how to represent Battleships in code
+[x] Render a board with Battleships
+
+#Pull 4
+[] Work out when a shot was a hit/miss
+[] Figure out overall state of the game
+[] Wrap everything needed to understand the game position in a single class - seperate each part of the program into different pieces
+ -- GameBoard class
+    * Battleship locations
+    * Shot locations
+    * Board dimensions
+    => battleship health (if a battleship is _ length == their health)
+    => was a shot a hit or a miss
+
+# pull 5
+[] show the player their current shots
