@@ -1,0 +1,13 @@
+#Pull 1
+[X] Initalize Git
+[X] Setup main.python3
+
+#Pull 2
+[X] Get input from player
+[X] Parse into x and y co-ordinates
+[X] Render an empty board
+[X] Render a board with shots
+
+#Pull 3
+[] Decide how to represent Battleships in code
+[] Render a board with Battleshipss
