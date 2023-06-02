@@ -24,4 +24,8 @@
     => was a shot a hit or a miss
 
 # pull 5
-[] show the player their current shots
+[X] show the player their current shots
+[X] render an "admin" board with both battleships and shots
+[x] hook our player input up to our game engine
+[x] end the game when all battleships have been destroyed
+
