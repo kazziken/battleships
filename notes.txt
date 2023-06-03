@@ -29,3 +29,18 @@
 [x] hook our player input up to our game engine
 [x] end the game when all battleships have been destroyed
 
+#pull 6
+[X] making our game: 2 players
+    Adding Second player =>
+    * 2 game boards
+
+    ###Later ###
+    Secret Way for players to arrange their battleships
+    * Right now can only hard code the battleships in the game
+    Random AI player
+    *Intelligent AI that looks at where current ships are and shoots next to them
+    *more detailed and neat "annoucements"
+    *more intricate board renderings
+
+[X] Alternate turns to take shots
+[X] Print the winner at the end of the game
