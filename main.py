@@ -1,4 +1,5 @@
 import copy
+import random
 
 class GameBoard(object):
     
@@ -43,8 +44,10 @@ class Shot(object):
 
 class Battleship(object):
     
-    def __init__(self, body):
+    #TODO: which of these params do we need to create a better rendering?
+    def __init__(self, body, direction):
         self.body = body
+        self.direction = direction
         #[False, False, False, True (when hit), False]
         self.hits = [False] * len(body)
     
@@ -68,7 +71,7 @@ class Battleship(object):
                 el = (head[0] - i, head[1])
                 
             body.append(el)
-        return Battleship(body)
+        return Battleship(body, direction)
     
     def is_destroyed(self):
         return all(self.hits)
@@ -76,6 +79,12 @@ class Battleship(object):
 # b = BattleShip.build((1,1), 5, "S")
 # b2 = BattleShip([(1,2), (1,3), (1,4), (1,5)])
 #these two are the same object but different initalization
+
+class Player(object):
+    
+    def __init__(self, name, shot_f):
+        self.name = name
+        self.shot_f = shot_f
     
 def render(game_board, show_battleships=False):
     header = "+" + "-" * game_board.width + "+"
@@ -89,8 +98,30 @@ def render(game_board, show_battleships=False):
     if show_battleships:
         #Add battleships to the board
         for b in game_board.battleships:
-            for x, y in b.body:
-                board[x][y] = "O"
+            # <-----> for horizontal
+            # ^
+            # |
+            # |
+            # v for vertical
+            for i, (x, y) in enumerate(b.body):
+                if b.direction == "N":
+                    chs = ('v', '|', '^')
+                elif b.direction == "S":
+                    chs = ('^', '|', 'v')
+                elif b.direction == "W":
+                    chs = ('>', '-', '<')
+                elif b.direction == "E":
+                    chs = ('<', '-', '>')
+                else:
+                    raise "Unknown direction"
+            
+                if i == 0:
+                    ch = chs[0]
+                elif i == len(b.body) -1:
+                    ch = chs[2]
+                else:
+                    ch = chs[1]
+                board[x][y] = ch
         
     #Add Shots to the board
     for sh in game_board.shots:
@@ -109,13 +140,27 @@ def render(game_board, show_battleships=False):
     
     print(header)
     
+def get_random_ai_shot(game_board):
+    #random.randint(a,b)
+    x = random.randint(0, game_board.width - 1) #we don't want 10 b/c its out of bounds (so -1)
+    y = random.randint(0, game_board.height -1)
+    return (x,y)
+
+def get_human_shot(game_board):
+    inp = input("Where do you want to shoot?\n")
+    xstr, ystr = inp.split(",") 
+    x = int(xstr)
+    y = int(ystr)
+    return (x,y)
+
+    
 if __name__ == '__main__':
     
     
     battleships = [
         Battleship.build((1,1), 2, "N"),
-        # Battleship.build((5,8), 5, "N"),
-        # Battleship.build((2,3), 4, "E")
+        Battleship.build((5,8), 5, "N"),
+        Battleship.build((2,3), 4, "E")
     ]
     
     game_boards = [
@@ -128,27 +173,31 @@ if __name__ == '__main__':
         "Frank"
     ]
     
+    players = [
+        Player("Joji", get_random_ai_shot),
+        Player("Frank", get_human_shot)
+    ]
+    
     #index of the offensive player
     offensive_idx = 0
 
     while True:
         #defensive player is always opposite of 0 b/c we'll make it permanently 1
         defensive_idx = (offensive_idx + 1) % 2 #if 1 then its defensive idx turn
-        defensive_board = game_boards[defensive_idx]
-        inp = input("Where do you want to shoot?\n")
-        # TO DO: DEAL WITH INVALID INPUTS
-        #assign first num to be x and second to y
-        xstr, ystr = inp.split(",") 
-        x = int(xstr)
-        y = int(ystr)
         
-        defensive_board.take_shot((x,y))
-        render(defensive_board)
+        defensive_board = game_boards[defensive_idx]
+        offensive_player = players[offensive_idx]
+        print("%s YOUR TURN!" % offensive_player.name)
+        # shot_location = get_human_shot(defensive_board)
+        shot_location = offensive_player.shot_f(defensive_board)
+        defensive_board.take_shot(shot_location)
+        render(defensive_board, True)
         
         if defensive_board.is_game_over():
-            print("%s has won!" %player_names[offensive_idx])
+            print("%s has won!" %offensive_player.name)
             break
         
         #offensive player becomes previous defensive player
+        #idx keeps switching between 0 and 1 to swap between game_boards
         offensive_idx = defensive_idx
         
