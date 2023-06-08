@@ -12,7 +12,11 @@ class GameBoard(object):
     
     #1 update the battleship with any hits - health
     #2 save the fact that the shot was a hit or miss
+    
+    #if hit, return the hit battleship
+    #else, return None
     def take_shot(self, shot_location):
+        hit_battleship = None
         is_hit = False
         for b in self.battleships:
             idx = b.body_index(shot_location)
@@ -20,9 +24,11 @@ class GameBoard(object):
                 #it is a hit
                 is_hit = True
                 b.hits[idx] = True
+                hit_battleship = b
+                break
                 
-        
         self.shots.append(Shot(shot_location, is_hit))
+        return hit_battleship
     
     def is_game_over(self):
         #or list comprehension (kinda reable)
@@ -139,7 +145,21 @@ def render(game_board, show_battleships=False):
         print("|" + "".join(row) + "|")
     
     print(header)
-    
+
+def announce(event_type, metadata={}):
+    if event_type == "game_over":
+        print("%s WINS THE GAME!" % metadata["player"])
+    elif event_type == "new_turn":
+        print("%s, YOUR TURN!" % metadata["player"])
+    elif event_type == "miss":
+        print("%s MISSED!" % metadata["player"])
+    elif event_type == "battleship_destroyed":
+        print("%s DESTROYED A BATTLESHIP" % metadata["player"])
+    elif event_type == "battleship_hit":
+        print("%s HIT A BATTLESHIP!" % metadata["player"])
+    else:
+        print("UNKNOWN EVENT TYPE: %s" % event_type)
+            
 def get_random_ai_shot(game_board):
     #random.randint(a,b)
     x = random.randint(0, game_board.width - 1) #we don't want 10 b/c its out of bounds (so -1)
@@ -159,8 +179,8 @@ if __name__ == '__main__':
     
     battleships = [
         Battleship.build((1,1), 2, "N"),
-        Battleship.build((5,8), 5, "N"),
-        Battleship.build((2,3), 4, "E")
+        # Battleship.build((5,8), 5, "N"),
+        # Battleship.build((2,3), 4, "E")
     ]
     
     game_boards = [
@@ -168,14 +188,9 @@ if __name__ == '__main__':
         GameBoard(copy.deepcopy(battleships), 10, 10)
     ]
     
-    player_names = [
-        "Joji",
-        "Frank"
-    ]
-    
     players = [
-        Player("Joji", get_random_ai_shot),
-        Player("Frank", get_human_shot)
+        Player("JOJI", get_random_ai_shot),
+        Player("FRANK", get_human_shot)
     ]
     
     #index of the offensive player
@@ -187,14 +202,23 @@ if __name__ == '__main__':
         
         defensive_board = game_boards[defensive_idx]
         offensive_player = players[offensive_idx]
-        print("%s YOUR TURN!" % offensive_player.name)
-        # shot_location = get_human_shot(defensive_board)
+        
+        announce("new_turn", {"player": offensive_player.name})
         shot_location = offensive_player.shot_f(defensive_board)
-        defensive_board.take_shot(shot_location)
+        
+        hit_battleship = defensive_board.take_shot(shot_location)
+        if hit_battleship is None:
+            announce("miss", {"player": offensive_player.name})
+        else:
+            if hit_battleship.is_destroyed():
+                announce("battleship_destroyed", {"player": offensive_player.name})
+            else:
+                announce("battleship_hit", {"player": offensive_player.name})
+                
         render(defensive_board, True)
         
         if defensive_board.is_game_over():
-            print("%s has won!" %offensive_player.name)
+            announce("game_over", {"player": offensive_player.name})
             break
         
         #offensive player becomes previous defensive player

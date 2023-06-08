@@ -47,11 +47,18 @@
 
 # pull 7
 [X] Random AI player
-[] Secret way for players to arrange their battlehips
-[X] More detailed and neat "annoucements"
 [X] More intricate board renderings
-[] Intelligent AI that looks at where current ships are and shoots next to them
 
 How are we doing our AI player
 * lets do a function that is our Ai player
  looks at GameBoard => Shot location
+
+#pull 8
+[] Secret way for players to arrange their battlehips
+[X] More detailed and neat "annoucements"
+ - annouce its your turn
+ - when u hit something
+ -when u miss something
+ -destroyed an entire battleship
+ - won
+[] Intelligent AI that looks at where current ships are and shoots next to them
